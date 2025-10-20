@@ -45,6 +45,31 @@ export const deleteExpense = async(req : Request, res:Response)=>{
     res.status(204).send();
 };
 
+export const updatedExpense = async(req : Request, res:Response)=>{
+    const expenseCollection = db.collection('expenses');
+    const id =req.params.id;
+    const docRef = expenseCollection.doc(id);
 
+    
+    const doc = await docRef.get();
+    if(!doc.exists){
+        return res.status(404).send({error : "Expense not found"});
+    }
+
+    const { description, amount, category, date } = req.body;
+
+    const updatedExpenseData = {
+            description,
+            amount:parseFloat(amount),
+            category,
+            date
+        };
+
+
+    await docRef.set(updatedExpenseData, { merge: true });
+    const updatedDoc = await docRef.get();
+
+    res.send({ id: updatedDoc.id, ...updatedDoc.data() });
+}
 
 
