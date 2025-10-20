@@ -4,18 +4,22 @@ import expenseRoutes from '../routes/expenseRoutes.ts';
 const app = express();
 app.use(express.json());
 
-interface Expense {
-    id: number;
-    description: string;
-    amount: number;
-    category: string;
-    date: string; 
+import admin from 'firebase-admin';
+
+import fs from 'fs';
+import path from 'path';
+
+const serviceAccountPath = path.resolve('./expenseTrackerServiceKey.json');
+const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf-8'));
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
 }
 
-export let expenses : Expense[] = [
-    { id: 1, description: 'Groceries', amount: 85.50, category: 'Food', date: '2025-10-05' },
-    { id: 2, description: 'Gas', amount: 45.00, category: 'Transport', date: '2025-10-06' },
-  ];
+
+export const db =admin.firestore();
 
 app.use('/',expenseRoutes);
 
