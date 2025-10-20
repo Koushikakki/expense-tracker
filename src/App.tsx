@@ -159,6 +159,10 @@ const ExpenseTracker: React.FC = () => {
     if(!window.confirm("Are you sure you want to delete expense")){
       return;
     }
+    const response = await fetch(`${API_URL}/expenses/${expense.id}`,{
+      method : 'DELETE'
+    });
+
     
     
   }
