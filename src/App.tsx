@@ -72,7 +72,7 @@ const ExpenseTracker: React.FC = () => {
 
   const fetchExpenses = async() =>{
 
-    const response = await fetch('{API_URL}/expenses');
+    const response = await fetch(`${API_URL}/expenses`);
     if(!response.ok){
       throw new Error('failed to fetch expenses');
     }
@@ -95,6 +95,7 @@ const ExpenseTracker: React.FC = () => {
       category: '',
       date: new Date().toISOString().split('T')[0]
     });
+    setEditingId(null);
     setIsModalOpen(true);
     
   
@@ -130,8 +131,8 @@ const ExpenseTracker: React.FC = () => {
     
     if(editingId){
       
-      const response = await fetch(`{API_URL}/expenses/{editing.id}`,{
-        method : 'POST',
+      const response = await fetch(`${API_URL}/expenses/{editing.id}`,{
+        method : 'PUT',
         headers : {'Content-Type' : 'application/json'},
         body : JSON.stringify(expenseBody)
       });
@@ -140,15 +141,16 @@ const ExpenseTracker: React.FC = () => {
       
     }
     else{
-      const newExpense : Expense = {
-        id : (expenses[expenses.length-1].id)+1,
-        description : formData.description,
-        amount : parseFloat(formData.amount),
-        category : formData.category,
-        date : formData.date
-      };
-      setExpenses([...expenses, newExpense]);
+
+      const response = await fetch(`${API_URL}/expenses`,{
+        method : 'POST',
+        headers : {'Content-Type' : 'application/json'},
+        body : JSON.stringify(expenseBody)
+      });
+
+      if(!response.ok) throw new Error('failed to add');
     }
+    await fetchExpenses();
     closeModal();
   };
 
