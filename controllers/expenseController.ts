@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { db } from '../server/server';
+import { error } from 'console';
 
 export const getAllExpenses = async (req :Request,res:Response) =>{
     
@@ -28,6 +29,22 @@ export const addExpense = async (req :Request,res:Response)=>{
     const addRef = await expenseCollection.add(newExpense);
     res.status(201).send({ id:addRef.id, ...newExpense});
 };
+
+export const deleteExpense = async(req : Request, res:Response)=>{
+    const expenseCollection = db.collection('expenses');
+    const id =req.params.id;
+    const docRef = expenseCollection.doc(id);
+
+    const doc = await docRef.get();
+    if(!doc.exists){
+        return res.status(404).send({error : "Expense not found"});
+    }
+    
+    await docRef.delete();
+
+    res.status(204).send();
+};
+
 
 
 
