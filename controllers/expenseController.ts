@@ -45,3 +45,15 @@ export const updatedExpense = (req : Request, res : Response)=> {
 
     res.send(updatedExpense);
 };
+
+
+export const deleteExpense = (req : Request, res:Response)=>{
+
+    console.log("got a delete request");
+
+    const id =parseInt(req.params.id);
+    const index = expenses.findIndex(task=> task.id===id);
+
+    expenses.splice(index,1);
+    res.status(204).send();
+};
