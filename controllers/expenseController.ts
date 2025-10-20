@@ -22,5 +22,26 @@ export const addExpense = (req : Request, res: Response) => {
     res.status(201).send(newExpense);
 };
 
+export const updatedExpense = (req : Request, res : Response)=> {
+    console.log("got a put request");
+    const id =parseInt(req.params.id);
 
+    const index = expenses.findIndex(task=>task.id===id);
+    if(index === -1){
+      return res.status(404).send("expense not found");
+    }
 
+    const { description, amount, category, date } = req.body;
+
+    const updatedExpense = {
+      id,
+      description,
+      amount:parseFloat(amount),
+      category,
+      date
+    }
+
+    expenses[index] = updatedExpense;
+
+    res.send(updatedExpense);
+};
