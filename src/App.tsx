@@ -115,6 +115,18 @@ const ExpenseTracker: React.FC = () => {
   };
 
   const handleSubmit = async() : Promise<void> => {
+
+    if(!formData.description || !formData.amount || !formData.date || !formData.category){
+      alert("Enter all the data fields");
+      return;
+    }
+
+    const expenseBody = {
+      description : formData.description,
+      amount : parseFloat(formData.amount),
+      categorie : formData.category,
+      date : formData.date
+    }
     
     if(editingId){
       const updatedExpense : Expense = {
