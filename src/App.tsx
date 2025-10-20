@@ -163,7 +163,9 @@ const ExpenseTracker: React.FC = () => {
       method : 'DELETE'
     });
 
-    
+    if(!response.ok) throw new Error("failed to delete");
+
+    await fetchExpenses();
     
   }
 
