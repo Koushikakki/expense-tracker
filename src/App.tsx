@@ -124,24 +124,20 @@ const ExpenseTracker: React.FC = () => {
     const expenseBody = {
       description : formData.description,
       amount : parseFloat(formData.amount),
-      categorie : formData.category,
+      category : formData.category,
       date : formData.date
     }
     
     if(editingId){
-      const updatedExpense : Expense = {
-        id: editingId,
-        description: formData.description,
-        amount: parseFloat(formData.amount),
-        category: formData.category,
-        date: formData.date
-      }
+      
+      const response = await fetch(`{API_URL}/expenses/{editing.id}`,{
+        method : 'POST',
+        headers : {'Content-Type' : 'application/json'},
+        body : JSON.stringify(expenseBody)
+      });
 
-      const updatedExpenses : Expense[]= expenses.map((exp) => 
-        exp.id === editingId ? updatedExpense : exp
-      );
-
-      setExpenses(updatedExpenses);
+      if(!response.ok) throw new Error('failed to update');
+      
     }
     else{
       const newExpense : Expense = {
