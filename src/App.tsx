@@ -131,7 +131,7 @@ const ExpenseTracker: React.FC = () => {
     
     if(editingId){
       
-      const response = await fetch(`${API_URL}/expenses/{editing.id}`,{
+      const response = await fetch(`${API_URL}/expenses/${editingId}`,{
         method : 'PUT',
         headers : {'Content-Type' : 'application/json'},
         body : JSON.stringify(expenseBody)
@@ -155,11 +155,12 @@ const ExpenseTracker: React.FC = () => {
   };
 
 
-  const handleDelete = (expense : Expense): void => {
+  const handleDelete =async (expense : Expense):Promise<void> => {
+    if(!window.confirm("Are you sure you want to delete expense")){
+      return;
+    }
     
-    const newExpenses : Expense[] = expenses.filter((task)=>task.id !== expense.id);
-    setExpenses(newExpenses);
-
+    
   }
 
 
