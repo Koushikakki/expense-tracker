@@ -1,4 +1,4 @@
-import React, { useState, CSSProperties } from 'react';
+import React, { useState, CSSProperties, useEffect } from 'react';
 import { Trash2, Edit2, Plus, DollarSign, Calendar, Tag, X } from 'lucide-react';
 import { styles } from './styles';
 
@@ -70,6 +70,22 @@ const ExpenseTracker: React.FC = () => {
 
   const API_URL = 'http://localhost:3001';
 
+  const fetchExpenses = async() =>{
+
+    const response = await fetch('{API_URL}/expenses');
+    if(!response.ok){
+      throw new Error('failed to fetch expenses');
+    }
+    const data : Expense[] = await response.json();
+
+    setExpenses(data);
+
+  };
+
+  useEffect(()=>{
+    fetchExpenses();
+  },[]);
+
 
   const handleAdd = () : void => {
     
@@ -98,7 +114,7 @@ const ExpenseTracker: React.FC = () => {
     
   };
 
-  const handleSubmit = () : void => {
+  const handleSubmit = async() : Promise<void> => {
     
     if(editingId){
       const updatedExpense : Expense = {
