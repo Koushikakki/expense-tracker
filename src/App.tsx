@@ -3,7 +3,7 @@ import { Trash2, Edit2, Plus, DollarSign, Calendar, Tag, X } from 'lucide-react'
 import { styles } from './styles';
 
 export interface Expense {
-  id: number;
+  id: string;
   description: string;
   amount: number;
   category: string;
@@ -24,7 +24,7 @@ interface ModalProps {
 }
 
 type HoveredButton = string | null;
-type HoveredExpense = number | null;
+type HoveredExpense = string | null;
 
 
 
@@ -41,10 +41,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 };
 
 const ExpenseTracker: React.FC = () => {
-   const [expenses, setExpenses] = useState<Expense[]>([
-    { id: 1, description: 'Groceries', amount: 85.50, category: 'Food', date: '2025-10-05' },
-    { id: 2, description: 'Gas', amount: 45.00, category: 'Transport', date: '2025-10-06' },
-  ]);
+   const [expenses, setExpenses] = useState<Expense[]>([]);
   
   const [formData, setFormData] = useState<FormData>({
     description: '',
@@ -53,7 +50,7 @@ const ExpenseTracker: React.FC = () => {
     date: new Date().toISOString().split('T')[0]
   });
   
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [hoveredButton, setHoveredButton] = useState<HoveredButton>(null);
   const [hoveredExpense, setHoveredExpense] = useState<HoveredExpense>(null);
@@ -70,6 +67,9 @@ const ExpenseTracker: React.FC = () => {
       date: new Date().toISOString().split('T')[0]
     });
   };
+
+  const API_URL = 'http://localhost:3001';
+
 
   const handleAdd = () : void => {
     
