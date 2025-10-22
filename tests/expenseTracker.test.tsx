@@ -24,5 +24,18 @@ test('render Add Expense button',async ()=>{
     
     const addButton = screen.getByText(/Add Expense/i);
     expect(addButton).toBeInTheDocument();
-})
+});
+
+test('opens model when click on add Expenses ',async ()=>{
+    await act (async ()=>{
+        render(<ExpenseTracker/>);
+    });
+
+    const addButton = screen.getByText(/Add Expense/i);
+    fireEvent.click(addButton);
+
+    const model = await screen.getByText(/Add New Expense/i);
+    expect(model).toBeInTheDocument();
+
+});
 
