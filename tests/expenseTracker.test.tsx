@@ -1,8 +1,7 @@
-import React from "react";
-import {render ,screen ,fireEvent} from  '@testing-library/react';
+import {render ,screen ,fireEvent,act} from  '@testing-library/react';
 import ExpenseTracker from '../src/App.tsx';
-import '@testing-library/jest-dom/extend-expect';
-import { json } from "stream/consumers";
+import '@testing-library/jest-dom';
+
 
 beforeEach(()=>{
     global.fetch = jest.fn(()=> 
@@ -18,5 +17,12 @@ afterEach(()=>{
     jest.clearAllMocks();
 });
 
-
+test('render Add Expense button',async ()=>{
+    await act(async ()=>{
+        render(<ExpenseTracker/>);
+    });
+    
+    const addButton = screen.getByText(/Add Expense/i);
+    expect(addButton).toBeInTheDocument();
+})
 
