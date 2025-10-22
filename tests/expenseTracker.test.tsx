@@ -59,5 +59,20 @@ test('shows alert message when input field is empty',async()=>{
 
 });
 
+test('close model on clicking cancel',async()=>{
+   await act(async()=>{
+    render(<ExpenseTracker/>);
+   });
+
+   const addExpense = await screen.getByText(/Add Expense/i);
+   fireEvent.click(addExpense);
+
+   fireEvent.click(screen.getByText(/Cancel/i));
+   await waitFor(()=>{
+    expect(screen.queryByText(/Add New Expense/i)).not.toBeInTheDocument();
+   });
+});
+
+
 
 
