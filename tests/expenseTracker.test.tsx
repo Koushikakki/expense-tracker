@@ -140,4 +140,64 @@ test('adds a new expense and display it',async()=>{
     });
 
 
+});
+
+
+test('updates an existing expense and display',async()=>{
+    const originalExpense = {
+    id: '1',
+    description: 'Gas',
+    amount: 10.0,
+    category: 'Transport',
+    date: '2025-10-20',
+  };
+    
+    const updatedExpense = {
+    ...originalExpense,
+    description: 'Updated Gas',
+    amount: 15.0,
+  };
+
+  jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: async () => [originalExpense],
+    } as Response);
+
+    jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}),
+    } as Response);
+
+    jest.spyOn(global, 'fetch')
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => [updatedExpense],
+    } as Response);
+
+     await act(async () => {
+    render(<ExpenseTracker />);
+  });
+
+
+
+  const editButton = await screen.findByTitle('Edit');
+  fireEvent.click(editButton);
+
+  fireEvent.change(screen.getByPlaceholderText(/Description/i), {
+    target: { value: updatedExpense.description },
+  });
+
+  fireEvent.change(screen.getByPlaceholderText(/0.00/i), {
+    target: { value: updatedExpense.amount.toString() },
+  });
+
+
+  const updateBtn = screen.getByRole('button', { name: /Update Expense/i });
+  fireEvent.click(updateBtn);
+
+
+  await waitFor(() => {
+    expect(screen.getByText(updatedExpense.description)).toBeInTheDocument();
+  });
+
 })
