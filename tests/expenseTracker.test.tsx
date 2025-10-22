@@ -1,6 +1,7 @@
 import {render ,screen ,fireEvent,act, waitFor} from  '@testing-library/react';
 import ExpenseTracker from '../src/App.tsx';
 import '@testing-library/jest-dom';
+import { Vault } from 'lucide-react';
 
 
 beforeEach(()=>{
@@ -82,3 +83,61 @@ const mockExpenses = [{
     date : '2025-10-20',
 },];
 
+test('adds a new expense and display it',async()=>{
+    const newExpense = {
+            id: '2',
+            description: 'Groceries',
+            amount: 25.0,
+            category: 'Food',
+            date: new Date().toISOString().split('T')[0],
+        };
+
+    jest.spyOn(global,'fetch').mockResolvedValueOnce({
+        ok : true,
+        json : async ()=> [],
+    } as Response);
+
+    await act (async()=>{
+        render(<ExpenseTracker/>);
+    });
+
+    fireEvent.click(screen.getByText(/Add Expense/i));
+
+    fireEvent.change(screen.getByPlaceholderText(/Description/i),{
+        target : {value : newExpense.description},
+    });
+
+    fireEvent.change(screen.getByPlaceholderText(/0.00/i),{
+        target : {value : newExpense.amount},
+    });
+
+    fireEvent.change(screen.getByDisplayValue(/Category/i),{
+        target : {value : newExpense.category},
+    });
+
+    fireEvent.change(screen.getByDisplayValue(newExpense.date),{
+        target : {value : newExpense.date},
+    });
+
+
+    jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+        ok : true,
+        json : async ()=>({}),
+    } as Response);
+
+    jest.spyOn(global,'fetch').mockResolvedValueOnce({
+        ok : true,
+        json : async ()=>[newExpense],
+    } as Response);
+
+
+    const submitButton = await screen.getAllByRole("button",{name :/Add Expense/i });
+
+    fireEvent.click(submitButton[1]);
+
+    await waitFor(()=>{
+        expect(screen.getByText(newExpense.description)).toBeInTheDocument();
+    });
+
+
+})
