@@ -74,5 +74,11 @@ test('close model on clicking cancel',async()=>{
 });
 
 
-
+const mockExpenses = [{
+    id : '1',
+    description : 'Gas',
+    amount : 10.0,
+    category : 'Transport',
+    date : '2025-10-20',
+},];
 
