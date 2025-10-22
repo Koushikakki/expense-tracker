@@ -14,5 +14,9 @@ beforeEach(()=>{
  ) as jest.Mock;
 });
 
+afterEach(()=>{
+    jest.clearAllMocks();
+});
+
 
 
