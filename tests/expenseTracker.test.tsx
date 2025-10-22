@@ -200,4 +200,50 @@ test('updates an existing expense and display',async()=>{
     expect(screen.getByText(updatedExpense.description)).toBeInTheDocument();
   });
 
+});
+
+
+test("delete a expense and removes it from list",async()=>{
+    const expense = {
+    id: '1',
+    description: 'Coffee',
+    amount: 5.5,
+    category: 'Food',
+    date: '2025-10-20',
+  };
+
+
+  jest.spyOn(window, 'confirm').mockReturnValue(true);
+
+  jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: async () => [expense],
+    } as Response);
+
+    jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}),
+    } as Response);
+
+    jest.spyOn(global, 'fetch')
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => [],
+    } as Response);
+
+
+    await act(async () => {
+    render(<ExpenseTracker />);
+  });
+
+
+  const deleteButton = screen.getByTitle('Delete');
+  fireEvent.click(deleteButton);
+
+
+  await waitFor(() => {
+    expect(screen.queryByText(expense.description)).not.toBeInTheDocument();
+  });
+
+
 })
