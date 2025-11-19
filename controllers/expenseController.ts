@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { db } from '../server/server';
+import { db } from '../server/server.ts';
 import { error } from 'console';
 
 export const getAllExpenses = async (req :Request,res:Response) =>{
@@ -21,7 +21,7 @@ export const addExpense = async (req :Request,res:Response)=>{
 
     const newExpense = {
         description: description,
-        amount: parseFloat(amount),
+        amount: amount,
         category: category,
         date: date,
     }
@@ -60,7 +60,7 @@ export const updatedExpense = async(req : Request, res:Response)=>{
 
     const updatedExpenseData = {
             description,
-            amount:parseFloat(amount),
+            amount:amount,
             category,
             date
         };

@@ -1,6 +1,6 @@
 import express from 'express';
 import expenseRoutes from '../routes/expenseRoutes.ts';
-
+import cors from 'cors';
 const app = express();
 app.use(express.json());
 
@@ -20,7 +20,7 @@ if (!admin.apps.length) {
 
 
 export const db =admin.firestore();
-
+app.use(cors());
 app.use('/',expenseRoutes);
 
 app.listen(3001,()=>{

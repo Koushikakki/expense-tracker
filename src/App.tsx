@@ -1,9 +1,9 @@
-import React, { useState, CSSProperties } from 'react';
+import React, { useState, CSSProperties, useEffect } from 'react';
 import { Trash2, Edit2, Plus, DollarSign, Calendar, Tag, X } from 'lucide-react';
 import { styles } from './styles';
 
 export interface Expense {
-  id: number;
+  id: string;
   description: string;
   amount: number;
   category: string;
@@ -24,7 +24,7 @@ interface ModalProps {
 }
 
 type HoveredButton = string | null;
-type HoveredExpense = number | null;
+type HoveredExpense = string | null;
 
 
 
@@ -41,10 +41,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 };
 
 const ExpenseTracker: React.FC = () => {
-   const [expenses, setExpenses] = useState<Expense[]>([
-    { id: 1, description: 'Groceries', amount: 85.50, category: 'Food', date: '2025-10-05' },
-    { id: 2, description: 'Gas', amount: 45.00, category: 'Transport', date: '2025-10-06' },
-  ]);
+   const [expenses, setExpenses] = useState<Expense[]>([]);
   
   const [formData, setFormData] = useState<FormData>({
     description: '',
@@ -53,7 +50,7 @@ const ExpenseTracker: React.FC = () => {
     date: new Date().toISOString().split('T')[0]
   });
   
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [hoveredButton, setHoveredButton] = useState<HoveredButton>(null);
   const [hoveredExpense, setHoveredExpense] = useState<HoveredExpense>(null);
@@ -71,6 +68,25 @@ const ExpenseTracker: React.FC = () => {
     });
   };
 
+  const API_URL = 'http://localhost:3001';
+
+  const fetchExpenses = async() =>{
+
+    const response = await fetch(`${API_URL}/expenses`);
+    if(!response.ok){
+      throw new Error('failed to fetch expenses');
+    }
+    const data : Expense[] = await response.json();
+
+    setExpenses(data);
+
+  };
+
+  useEffect(()=>{
+    fetchExpenses();
+  },[]);
+
+
   const handleAdd = () : void => {
     
     setFormData({
@@ -79,6 +95,7 @@ const ExpenseTracker: React.FC = () => {
       category: '',
       date: new Date().toISOString().split('T')[0]
     });
+    setEditingId(null);
     setIsModalOpen(true);
     
   
@@ -98,42 +115,58 @@ const ExpenseTracker: React.FC = () => {
     
   };
 
-  const handleSubmit = () : void => {
+  const handleSubmit = async() : Promise<void> => {
+
+    if(!formData.description || !formData.amount || !formData.date || !formData.category){
+      alert("Enter all the data fields");
+      return;
+    }
+
+    const expenseBody = {
+      description : formData.description,
+      amount : parseFloat(formData.amount),
+      category : formData.category,
+      date : formData.date
+    }
     
     if(editingId){
-      const updatedExpense : Expense = {
-        id: editingId,
-        description: formData.description,
-        amount: parseFloat(formData.amount),
-        category: formData.category,
-        date: formData.date
-      }
+      
+      const response = await fetch(`${API_URL}/expenses/${editingId}`,{
+        method : 'PUT',
+        headers : {'Content-Type' : 'application/json'},
+        body : JSON.stringify(expenseBody)
+      });
 
-      const updatedExpenses : Expense[]= expenses.map((exp) => 
-        exp.id === editingId ? updatedExpense : exp
-      );
-
-      setExpenses(updatedExpenses);
+      if(!response.ok) throw new Error('failed to update');
+      
     }
     else{
-      const newExpense : Expense = {
-        id : (expenses[expenses.length-1].id)+1,
-        description : formData.description,
-        amount : parseFloat(formData.amount),
-        category : formData.category,
-        date : formData.date
-      };
-      setExpenses([...expenses, newExpense]);
+
+      const response = await fetch(`${API_URL}/expenses`,{
+        method : 'POST',
+        headers : {'Content-Type' : 'application/json'},
+        body : JSON.stringify(expenseBody)
+      });
+
+      if(!response.ok) throw new Error('failed to add');
     }
+    await fetchExpenses();
     closeModal();
   };
 
 
-  const handleDelete = (expense : Expense): void => {
-    
-    const newExpenses : Expense[] = expenses.filter((task)=>task.id !== expense.id);
-    setExpenses(newExpenses);
+  const handleDelete =async (expense : Expense):Promise<void> => {
+    if(!window.confirm("Are you sure you want to delete expense")){
+      return;
+    }
+    const response = await fetch(`${API_URL}/expenses/${expense.id}`,{
+      method : 'DELETE'
+    });
 
+    if(!response.ok) throw new Error("failed to delete");
+
+    await fetchExpenses();
+    
   }
 
 
